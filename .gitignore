@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rout
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.ipynb_checkpoints/
+
+# Quarto / Markdown build caches
+.quarto/
+*_cache/
+*_files/
+
+# Archivos pesados o binarios no versionables (>50MB o PDFs pesados de fuentes)
+*.tar.gz
+*.zip
+*.7z
+# Nota: Documentar enlaces y hashes de PDFs oficiales en MANIFIESTO.csv en lugar de commitear megabytes de PDFs.
+*.pdf
+
+# Variables de entorno y secretos
+.env
+.env.local
