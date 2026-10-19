@@ -40,7 +40,18 @@ paraguay-en-datos/
 | Tema | Descripción | Tecnologías | Enlace |
 | :--- | :--- | :--- | :--- |
 | **Homicidios y Violencia (2006–2024)** | Evolución temporal de víctimas, tasas departamentales y análisis de feminicidio. | R (`ggplot2`), INE, MDI | [Ver módulo `seguridad/`](seguridad/) |
-| **Transición Demográfica y Fecundidad** | Caída histórica de la Tasa Global de Fecundidad (TGF), comparativa regional LATAM y censos 1950–2024. | R, INE, CELADE, ONU WPP | [Ver módulo `demografia/`](demografia/) |
+| **Transición Demográfica y Fecundidad** | TGF 1950–2024 para América Latina y el Caribe y siete países; vista generacional (hijos a los 30 años, cohortes 1950–1995). Dos figuras interactivas en D3.js. | D3.js, Python, ONU WPP 2024 | [Ver módulo `demografia/`](demografia/) |
+
+### Figuras interactivas
+
+| Figura | Qué muestra |
+| :--- | :--- |
+| [TGF 1950–2024](demografia/figuras/tfr-latam-1950-2024.html) | 75 años de caída, ocho series, con conmutador 1950-2024 / últimos 20 años y tooltip por año |
+| [Hijos a los 30 por generación](demografia/figuras/tfr-generacional.html) | Cohorte de nacimiento 1950–1995, con eje doble (año de nacimiento y edad en 2025) |
+
+> Las figuras leen los CSV de `demografia/datos/` con rutas relativas: para verlas en local hace falta
+> un servidor estático (`python3 -m http.server 8000`) o GitHub Pages.
+
 
 ---
 

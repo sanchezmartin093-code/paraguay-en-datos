@@ -37,3 +37,11 @@ venv/
 # Variables de entorno y secretos
 .env
 .env.local
+
+# Insumos crudos: se descargan con scripts/01_extraer_wpp.py y se verifican por sha256
+.fuente/
+*.csv.gz
+demografia/.fuente/
+
+# Salidas de verificación locales
+.fuente_hash.txt

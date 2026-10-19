@@ -1,0 +1,31 @@
+name: Verificar datos y figuras
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  demografia:
+    name: demografía · manifiesto, hashes y figuras selladas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verificar integridad del módulo
+        working-directory: demografia
+        run: python3 scripts/verificar_manifiesto.py
+
+      - name: Comprobar que no hay hashes pendientes en las figuras
+        working-directory: demografia
+        run: |
+          if grep -R 'PENDIENTE' figuras/ ; then
+            echo "::error::Hay figuras sin sellar. Corré scripts/02_sellar_figuras.py"
+            exit 1
+          fi
+          echo "OK: ninguna figura queda con hash pendiente"
