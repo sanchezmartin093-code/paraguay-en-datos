@@ -22,6 +22,7 @@ FIGURAS = os.path.join(BASE, "figuras")
 FIGURAS_CSV = {
     "tfr-latam-1950-2024.html": "tfr_8entidades_1950_2024.csv",
     "tfr-generacional.html": "tfr_cohorte_hijos_30_1950_1995.csv",
+    "tfr-animacion.html": "tfr_8entidades_1950_2024.csv",
 }
 
 

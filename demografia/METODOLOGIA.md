@@ -71,6 +71,26 @@ adelante hace falta un *paper* por módulo o un libro (`quarto book`), Quarto en
 publicación que consume los mismos CSV**, no como reemplazo del pipeline. Meterlo ahora duplica la
 infraestructura sin resolver nada que el HTML estático no resuelva.
 
+### Animación: dos implementaciones, un dato
+
+| Formato | Archivo | Cuándo usarlo |
+|---|---|---|
+| **D3 interactivo** | `figuras/tfr-animacion.html` | Reproduce/pausa, barra de arrastre, `?anio=1990` para fijar un año. Todo en el navegador, sin assets |
+| **GIF** | `figuras/tfr-animacion.gif` | Se incrusta en README, presentaciones o redes. 75 cuadros, 869×495 px, 1,7 MB, 5,2 s |
+
+El GIF lo genera `03_animacion.py` con matplotlib + Pillow: un cuadro por año, panel de valores a la
+derecha y barra de progreso. **No es un video exportado del HTML** —son dos renderizadores distintos
+sobre el mismo CSV— y por eso ambos llevan el mismo hash. Regenerar el GIF **cambia su propio hash**,
+así que el script actualiza su fila en `manifiesto.csv` antes de que corra el verificador.
+
+Detalles de implementación que importan:
+
+- El GIF se cuantiza a 128 colores con dithering desactivado: con dithering, las líneas finas se
+  llenan de ruido y el archivo pesa el doble.
+- Se agregan 12 cuadros duplicados al final: sin esa pausa, el último año se pierde al reiniciar el loop.
+- La página D3 respeta `prefers-reduced-motion`: quien tenga esa preferencia activada ve directamente
+  el estado final en lugar de la animación.
+
 ### Paleta
 
 Ocho series no pueden codificarse solo con color: medido con el verificador de la bóveda, el set elegido

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La fecundidad cae en toda la región · animación · Paraguay en Datos</title>
+<meta name="description" content="Animación de la tasa global de fecundidad 1950-2024 en América Latina y el Caribe y siete países.">
+<style>
+  :root{--tinta:#1a1a1a;--gris:#5a5a5a;--suave:#8a8a8a;--linea:#e6e6e6;--papel:#fff;--fondo:#fbfbfa;--acento:#b03a2e}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fondo);color:var(--tinta);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:1060px;margin:0 auto;padding:26px 20px 44px}
+  h1{margin:0 0 4px;font-size:24px;letter-spacing:-.2px}
+  .sub{margin:0;color:var(--gris);font-size:14px}
+  .panel{display:grid;grid-template-columns:1fr 232px;gap:6px;background:var(--papel);
+         border:1px solid var(--linea);border-radius:12px;padding:12px 12px 8px;margin-top:16px}
+  @media(max-width:720px){.panel{grid-template-columns:1fr}}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .axis text{fill:var(--suave);font-size:11px}
+  .axis line,.axis path{stroke:var(--linea)}
+  .grid line{stroke:#ededed}
+  .grid .domain{display:none}
+  .serie{fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+  .punto{stroke:#fff;stroke-width:.8}
+  .reemplazo{stroke:var(--acento);stroke-width:1.2;stroke-dasharray:5 4}
+  .reemplazo-txt{fill:var(--acento);font-size:11px}
+  #panel-der{padding:6px 4px 0 10px;border-left:1px solid var(--linea)}
+  @media(max-width:720px){#panel-der{border-left:0;border-top:1px solid var(--linea);padding:10px 0 0}}
+  #anio-big{font-size:34px;font-weight:700;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+  #panel-der .unidad{color:var(--suave);font-size:11.5px;margin-bottom:10px}
+  #valores{list-style:none;margin:0;padding:0}
+  #valores li{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:7px;
+              font-size:11.5px;margin:5px 0}
+  #valores .sw{height:3px;border-radius:2px}
+  #valores .nm{color:var(--gris);line-height:1.15;white-space:normal}
+  #valores li.fuerte .nm{color:var(--tinta);font-weight:650}
+  #valores .vl{font-variant-numeric:tabular-nums;font-weight:600}
+  .controls{display:flex;align-items:center;gap:12px;margin-top:12px}
+  button{background:var(--tinta);color:#fff;border:0;border-radius:999px;padding:8px 18px;
+         font-size:13px;cursor:pointer;min-width:112px}
+  button:hover{background:#000}
+  button:focus-visible{outline:2px solid #0072b2;outline-offset:2px}
+  input[type=range]{flex:1;accent-color:#1a1a1a}
+  #etiqueta{font-variant-numeric:tabular-nums;color:var(--gris);font-size:12.5px;min-width:94px;text-align:right}
+  footer{margin-top:20px;font-size:12px;color:var(--suave);line-height:1.6}
+  footer code{background:#f1f1ef;padding:1px 5px;border-radius:4px;font-size:11.5px;color:var(--gris)}
+  footer a{color:#0072b2;text-decoration:none} footer a:hover{text-decoration:underline}
+  .aviso{background:#fff6f5;border:1px solid #f2d5d1;color:#8c2f26;padding:10px 12px;border-radius:8px;
+         font-size:13px;margin-top:12px;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>La fecundidad cae en toda la región</h1>
+  <p class="sub">Tasa global de fecundidad, 1950-2024 · América Latina y el Caribe y siete países ·
+    <strong>UN WPP 2024</strong>, variante media</p>
+
+  <div class="panel">
+    <div id="chart"></div>
+    <aside id="panel-der">
+      <div id="anio-big">1950</div>
+      <div class="unidad">hijos por mujer</div>
+      <ol id="valores"></ol>
+    </aside>
+  </div>
+
+  <div class="controls">
+    <button id="play" aria-label="Reproducir la animación">Reproducir</button>
+    <input id="scrub" type="range" min="1950" max="2024" value="1950" step="1"
+           aria-label="Año de la animación">
+    <span id="etiqueta">1950 · 0 %</span>
+  </div>
+  <div class="aviso" id="aviso">No se pudo cargar <code>datos/tfr_8entidades_1950_2024.csv</code>.
+    Abrí la página con un servidor local o desde GitHub Pages.</div>
+
+  <footer>
+    <strong>Fuente:</strong> UN WPP 2024, variante media · consulta 2026-10-19.
+    <strong>Dato:</strong> <code>demografia/datos/tfr_8entidades_1950_2024.csv</code> ·
+    <code>sha256</code>: <code id="hash-dato">—</code><br>
+    <strong>Trazabilidad:</strong> <a href="../datos/manifiesto.csv">manifiesto.csv</a> ·
+    <a href="../METODOLOGIA.md">METODOLOGIA.md</a> ·
+    <a href="../scripts/03_animacion.py">03_animacion.py</a> (misma animación en GIF)<br>
+    <strong>2024 es estimación del modelo</strong>, no registro administrativo.
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+const META = { archivo: "datos/tfr_8entidades_1950_2024.csv", sha256: "f31662adb18aee5e57f28d13ee7862d7f6d0b2a0dc2812583ecaa3e224afba23",
+               fechaConsulta: "2026-10-19" };
+document.getElementById("hash-dato").textContent = META.sha256;
+
+const ORDEN = ["LAC","Brasil","Paraguay","México","Colombia","Argentina","Perú","Chile"];
+const NOMBRE = {LAC:"América Latina y el Caribe",Brasil:"Brasil",Paraguay:"Paraguay",México:"México",
+  Colombia:"Colombia",Argentina:"Argentina",Perú:"Perú",Chile:"Chile"};
+const COLOR = {LAC:"#0072B2",Brasil:"#D55E00",Paraguay:"#009E73",México:"#CC79A7",
+  Colombia:"#8C564B",Argentina:"#B8860B",Perú:"#6A3D9A",Chile:"#333333"};
+const TRAZO = {LAC:"none",Brasil:"none",Paraguay:"7 4",México:"2 3",
+  Colombia:"9 3 2 3",Argentina:"5 3",Perú:"3 3",Chile:"1 3"};
+const FUERTE = new Set(["LAC","Brasil","Paraguay"]);
+const ANIO_MIN = 1950, ANIO_MAX = 2024, DURACION_CUADRO = 90;
+
+const ancho = 780, alto = 430, M = {top: 14, right: 16, bottom: 34, left: 46};
+const x = d3.scaleLinear().domain([ANIO_MIN, ANIO_MAX]).range([M.left, ancho - M.right]);
+const y = d3.scaleLinear().domain([0, 7.2]).range([alto - M.bottom, M.top]);
+
+const svg = d3.select("#chart").append("svg")
+  .attr("viewBox", [0, 0, ancho, alto])
+  .attr("role", "img")
+  .attr("aria-label", "Animación de la tasa global de fecundidad, 1950 a 2024");
+
+const gGrid = svg.append("g").attr("class", "grid");
+const gSeries = svg.append("g");
+const gPuntos = svg.append("g");
+const gX = svg.append("g").attr("class", "axis").attr("transform", `translate(0,${alto - M.bottom})`);
+const gY = svg.append("g").attr("class", "axis").attr("transform", `translate(${M.left},0)`);
+
+gY.call(d3.axisLeft(y).tickValues(d3.range(0, 7.1, 1)));
+gGrid.call(d3.axisLeft(y).tickValues(d3.range(0, 7.1, 1))
+  .tickSize(-(ancho - M.left - M.right)).tickFormat("")).select(".domain").remove();
+gX.call(d3.axisBottom(x).tickValues([1950,1960,1970,1980,1990,2000,2010,2024]).tickFormat(d3.format("d")));
+
+svg.append("text").attr("x", M.left).attr("y", alto - 6)
+  .attr("fill", "#8a8a8a").attr("font-size", 11).text("Año calendario");
+svg.append("text").attr("transform", `translate(12,${(alto - M.bottom + M.top) / 2}) rotate(-90)`)
+  .attr("text-anchor", "middle").attr("fill", "#8a8a8a").attr("font-size", 11)
+  .text("Hijos por mujer");
+
+svg.append("line").attr("class", "reemplazo")
+  .attr("x1", M.left).attr("x2", ancho - M.right).attr("y1", y(2.1)).attr("y2", y(2.1));
+svg.append("text").attr("class", "reemplazo-txt")
+  .attr("x", M.left + 6).attr("y", y(2.1) - 6).text("reemplazo generacional · 2,10");
+
+const guia = svg.append("line").attr("x1", 0).attr("x2", 0)
+  .attr("y1", M.top).attr("y2", alto - M.bottom)
+  .attr("stroke", "#cfcfcf").attr("stroke-width", 1.2);
+
+let serie = new Map(), anio = ANIO_MIN, reproduciendo = false, timer = null;
+const linea = d3.line().x(d => x(d.anio)).y(d => y(d.tgf)).curve(d3.curveMonotoneX);
+
+const lista = d3.select("#valores");
+const play = document.getElementById("play");
+const scrub = document.getElementById("scrub");
+const etiqueta = document.getElementById("etiqueta");
+
+function pintar(a) {
+  anio = a;
+  document.getElementById("anio-big").textContent = a;
+  guia.attr("x1", x(a)).attr("x2", x(a));
+
+  gSeries.selectAll("path.serie").data(ORDEN, d => d).join("path")
+    .attr("class", d => "serie" + (FUERTE.has(d) ? " fuerte" : ""))
+    .attr("stroke", d => COLOR[d])
+    .attr("stroke-dasharray", d => TRAZO[d])
+    .attr("d", d => linea(serie.get(d).filter(v => v.anio <= a)));
+
+  gPuntos.selectAll("circle.punto").data(ORDEN, d => d).join("circle")
+    .attr("class", "punto")
+    .attr("cx", x(a)).attr("cy", d => y(serie.get(d).find(v => v.anio === a).tgf))
+    .attr("r", 4).attr("stroke", "#fff").attr("stroke-width", 0.9).attr("fill", d => COLOR[d]);
+
+  const filas = ORDEN.map(k => ({k, v: serie.get(k).find(v => v.anio === a).tgf}))
+    .sort((p, q) => q.v - p.v);
+  lista.selectAll("li").data(filas, d => d.k).join("li")
+    .attr("class", d => FUERTE.has(d.k) ? "fuerte" : null)
+    .html(d => `<span class="sw" style="background:${COLOR[d.k]};${
+        TRAZO[d.k] === "none" ? "" : "opacity:.85"}"></span>
+      <span class="nm">${NOMBRE[d.k]}</span>
+      <span class="vl" style="color:${COLOR[d.k]}">${d.v.toFixed(2).replace(".", ",")}</span>`);
+
+  scrub.value = a;
+  etiqueta.textContent = `${a} · ${Math.round((a - ANIO_MIN) / (ANIO_MAX - ANIO_MIN) * 100)} %`;
+}
+
+function detener() {
+  reproduciendo = false;
+  clearInterval(timer);
+  play.textContent = "Reproducir";
+  play.setAttribute("aria-label", "Reproducir la animación");
+}
+function arrancar() {
+  if (anio >= ANIO_MAX) pintar(ANIO_MIN);
+  reproduciendo = true;
+  play.textContent = "Pausar";
+  play.setAttribute("aria-label", "Pausar la animación");
+  timer = setInterval(() => {
+    if (anio >= ANIO_MAX) { detener(); return; }
+    pintar(anio + 1);
+  }, DURACION_CUADRO);
+}
+play.addEventListener("click", () => reproduciendo ? detener() : arrancar());
+scrub.addEventListener("input", e => { detener(); pintar(+e.target.value); });
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && e.target.tagName !== "INPUT") { e.preventDefault(); play.click(); }
+});
+
+d3.csv("../" + META.archivo, d => ({entidad: d.entidad, anio: +d.anio, tgf: +d.tgf}))
+  .then(filas => {
+    ORDEN.forEach(k => serie.set(k, filas.filter(d => d.entidad === k).sort((a, b) => a.anio - b.anio)));
+    const pedido = +new URLSearchParams(location.search).get("anio");
+    pintar(Number.isFinite(pedido) && pedido >= ANIO_MIN && pedido <= ANIO_MAX ? pedido : ANIO_MIN);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) pintar(ANIO_MAX);
+  })
+  .catch(() => d3.select("#aviso").style("display", "block"));
+</script>
+</body>
+</html>

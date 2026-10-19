@@ -48,6 +48,11 @@ paraguay-en-datos/
 | :--- | :--- |
 | [TGF 1950–2024](demografia/figuras/tfr-latam-1950-2024.html) | 75 años de caída, ocho series, con conmutador 1950-2024 / últimos 20 años y tooltip por año |
 | [Hijos a los 30 por generación](demografia/figuras/tfr-generacional.html) | Cohorte de nacimiento 1950–1995, con eje doble (año de nacimiento y edad en 2025) |
+| [Animación 1950–2024](demografia/figuras/tfr-animacion.html) | Reproducción año por año, con pausa, barra de arrastre y panel de valores |
+
+**Animación (GIF, se reproduce solo):**
+
+![La fecundidad cae en toda la región — 1950 a 2024](demografia/figuras/tfr-animacion.gif)
 
 > Las figuras leen los CSV de `demografia/datos/` con rutas relativas: para verlas en local hace falta
 > un servidor estático (`python3 -m http.server 8000`) o GitHub Pages.

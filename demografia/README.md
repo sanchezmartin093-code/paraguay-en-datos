@@ -10,6 +10,8 @@ con dos lecturas del mismo fenómeno: por **año calendario** (1950-2024) y por 
 |---|---|---|
 | [`figuras/tfr-latam-1950-2024.html`](figuras/tfr-latam-1950-2024.html) | TGF por año, 1950-2024. Botón para saltar a los últimos 20 años; tooltip con los ocho valores de cada año | `datos/tfr_8entidades_1950_2024.csv` |
 | [`figuras/tfr-generacional.html`](figuras/tfr-generacional.html) | Hijos acumulados a los 30 años por cohorte de nacimiento (1950-1995), con eje doble: año de nacimiento y edad en 2025 | `datos/tfr_cohorte_hijos_30_1950_1995.csv` |
+| [`figuras/tfr-animacion.html`](figuras/tfr-animacion.html) | **Animación** año por año 1950-2024, con reproduce/pausa, barra de arrastre y panel de valores. Acepta `?anio=1990` para abrir en un año fijo | `datos/tfr_8entidades_1950_2024.csv` |
+| [`figuras/tfr-animacion.gif`](figuras/tfr-animacion.gif) | La misma animación en GIF (75 cuadros, 5,2 s), para incrustar en README o redes | `datos/tfr_8entidades_1950_2024.csv` |
 
 **Cómo verlas.** Un navegador no puede leer archivos locales desde `file://` por seguridad, así que
 hay dos caminos:
@@ -30,13 +32,16 @@ demografia/
 ├── datos/
 │   ├── tfr_8entidades_1950_2024.csv           600 filas (8 series × 75 años)
 │   ├── tfr_cohorte_hijos_30_1950_1995.csv     368 filas (8 series × 46 cohortes)
-│   └── manifiesto.csv                         16 filas: fuente, fecha, sha256, script
+│   └── manifiesto.csv                         17 filas: fuente, fecha, sha256, script
 ├── figuras/
 │   ├── tfr-latam-1950-2024.html
-│   └── tfr-generacional.html
+│   ├── tfr-generacional.html
+│   ├── tfr-animacion.html
+│   └── tfr-animacion.gif
 ├── scripts/
 │   ├── 01_extraer_wpp.py        descarga el WPP y regenera los dos CSV + el manifiesto
 │   ├── 02_sellar_figuras.py     inyecta el sha256 del dato dentro de cada figura
+│   ├── 03_animacion.py          renderiza el GIF cuadro a cuadro (matplotlib + Pillow)
 │   └── verificar_manifiesto.py  control de integridad (lo corre la CI)
 └── METODOLOGIA.md
 ```
@@ -46,11 +51,12 @@ demografia/
 ```bash
 cd demografia
 python3 scripts/01_extraer_wpp.py        # 1) datos desde el WPP (descarga ~320 MB la primera vez)
-python3 scripts/02_sellar_figuras.py     # 2) sella las figuras con el hash del dato
-python3 scripts/verificar_manifiesto.py  # 3) verifica: debe imprimir PASS
+python3 scripts/03_animacion.py          # 2) opcional: regenera el GIF y registra su hash
+python3 scripts/02_sellar_figuras.py     # 3) sella las figuras con el hash del dato
+python3 scripts/verificar_manifiesto.py  # 4) verifica: debe imprimir PASS
 ```
 
-El paso 3 es el mismo que corre GitHub Actions en cada push: si alguien edita un CSV y no vuelve
+El paso 4 es el mismo que corre GitHub Actions en cada push: si alguien edita un CSV y no vuelve
 a sellar las figuras, el chequeo falla.
 
 ## Qué se puede y qué no se puede decir con estos datos
