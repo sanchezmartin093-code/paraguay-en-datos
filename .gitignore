@@ -139,3 +139,9 @@ build/
 _privado/
 
 # <<< REPO SLIM POLICY <<<
+
+# --- Sealed artifacts intentionally tracked (see auditoria/SEALED_ARTIFACTS.txt) ---
+!demografia/figuras/tfr-animacion.gif
+!demografia/figuras/tfr-animacion.html
+!demografia/figuras/tfr-generacional.html
+!demografia/figuras/tfr-latam-1950-2024.html
